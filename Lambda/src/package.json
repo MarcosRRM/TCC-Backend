@@ -1,0 +1,20 @@
+{
+  "name": "tcc-backend",
+  "version": "1.0.0",
+  "description": "Lambda Backend for RDT App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cleanBuild": "if exist .\\_TSBuild rmdir .\\_TSBuild /q /s",
+    "zipBuild": "cd .\\_TSBuild && 7z a Build.zip .\\GeneratedJS\\*",
+    "build": "npm run cleanBuild && tsc && npm run zipBuild"
+  },
+  "author": "Marcos R. R. Marques",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.0.5",
+    "@types/pg": "^7.14.3",
+    "aws-lambda-router": "^0.8.3",
+    "pg": "^8.2.1"
+  }
+}
