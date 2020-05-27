@@ -12,29 +12,47 @@ const ConnPool = new Pool({
 
 export default {
 	
-
-	RDTListAll: async function(event: any, context:any){
+	GetRDTList: async function(event: any, context:any){
 		
 		return ConnPool.query('SELECT * FROM "DiariesDB".rdt')
-		.then((res)=>{
-			if (res.rowCount>0){ return Return.Ok(RDTArrayFromRows(res.rows)); }
-			else{ return Return.NoContent(); }
-		})
+		.then((res)=> Return.Ok(RDTArrayFromRows(res.rows)))
 		.catch((err)=>Return.Error(err));
 
 	},
 
-	RDTListByAuthor: function(event: any, context:any){
+	GetRDT: function(event: any, context:any){
+
+		return ConnPool.query('SELECT * FROM "DiariesDB".rdt WHERE id = $1::numeric', [event.pathParameters.id])
+		.then((res)=>{
+			if (res.rowCount>0){ return Return.Ok(RDTFromRow(res.rows[0])); }
+			else{ return Return.NotFound('No Such RDT'); }
+		})
+		.catch((err)=>{
+			if (err.code==='22P02'){ return Return.BadReq('Invalid Resource') }
+			else{ return Return.Error(err)}
+		});
+	},
+
+	GetRDTListByAuthor: function(event: any, context:any){
 
 		return ConnPool.query('SELECT * FROM "DiariesDB".rdt WHERE person_id = $1::numeric', [event.pathParameters.id])
-		.then((res)=>{
-			if (res.rowCount>0){ return Return.Ok(RDTArrayFromRows(res.rows)); }
-			else{ return Return.NoContent(); }
-		})
+		.then((res)=> Return.Ok(RDTArrayFromRows(res.rows)))
 		.catch((err)=>{
 			if (err.code==='22P02'){ return Return.BadReq("Invalid Author") }
 			else{ return Return.Error(err)}
 		});
+	},
+
+	PostRDT: function(event: any, context:any){
+
+		return Return.Ok({data:'To Do'})
+
+	},
+
+	PutRDT: function(event: any, context:any){
+
+		return Return.Ok('To Do')
+
 	}
 
 };
