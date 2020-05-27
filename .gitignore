@@ -1,6 +1,6 @@
 # BuildZips
 *.zip
-*/_TSBuild
+*_TSBuild
 
 # Logs
 logs
