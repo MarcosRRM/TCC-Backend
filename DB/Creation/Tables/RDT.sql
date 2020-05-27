@@ -1,5 +1,5 @@
-CREATE TABLE "DiariesDB".rdt (
-	id int NOT NULL GENERATED ALWAYS AS IDENTITY,
+CREATE TABLE IF NOT EXISTS "DiariesDB".rdt (
+	id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
 	tittle varchar(32) NULL,
 	datetime timestamp not null,
 	situation varchar(255) NULL,
