@@ -20,6 +20,6 @@ export function UserFromRow(row:UserRow){
   return new User(row.email,row.password_hash,row.id);
 }
 
-export function UserListFromRows(rows:UserRow[]){
+export function UserArrayFromRows(rows:UserRow[]){
   return rows.map((row)=>UserFromRow(row));
 }

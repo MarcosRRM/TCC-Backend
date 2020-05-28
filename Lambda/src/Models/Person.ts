@@ -20,6 +20,6 @@ export function PersonFromRow(row:iPersonRow){
   return new Person(row.full_name,row.user_id,row.id);
 }
 
-export function PersonListFromRows(rows:iPersonRow[]){
+export function PersonArrayFromRows(rows:iPersonRow[]){
   return rows.map((row)=> PersonFromRow(row));
 }

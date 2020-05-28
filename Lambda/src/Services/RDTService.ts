@@ -1,18 +1,10 @@
 import {Return} from '../Utils/HTTPUtils';
 import {RDTFromRow, RDTArrayFromRows} from '../Models/RDT';
-import {Pool} from "pg";
-
-
-
-
-const ConnPool = new Pool({
-	max: 5,
-	connectionTimeoutMillis: 5000
-})
+import ConnPool from "../Utils/DBModule";
 
 export default {
 	
-	GetRDTList: async function(event: any, context:any){
+	GetRDTArray: async function(event: any, context:any){
 		
 		return ConnPool.query('SELECT * FROM "DiariesDB".rdt')
 		.then((res)=> Return.Ok(RDTArrayFromRows(res.rows)))
@@ -33,7 +25,7 @@ export default {
 		});
 	},
 
-	GetRDTListByAuthor: function(event: any, context:any){
+	GetRDTArrayByAuthor: function(event: any, context:any){
 
 		return ConnPool.query('SELECT * FROM "DiariesDB".rdt WHERE person_id = $1::numeric', [event.pathParameters.id])
 		.then((res)=> Return.Ok(RDTArrayFromRows(res.rows)))
@@ -41,12 +33,6 @@ export default {
 			if (err.code==='22P02'){ return Return.BadReq("Invalid Author") }
 			else{ return Return.Error(err)}
 		});
-	},
-
-	PostRDT: function(event: any, context:any){
-
-		return Return.Ok({data:'To Do'})
-
 	},
 
 	PutRDT: function(event: any, context:any){
