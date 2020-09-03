@@ -1,5 +1,5 @@
 {
-  "name": "router-layer",
+  "name": "sha-layer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-lambda-router": "^0.8.4"
+    "js-sha512": "^0.8.0"
   }
 }

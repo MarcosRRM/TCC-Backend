@@ -7,7 +7,11 @@ CREATE TABLE IF NOT EXISTS "DiariesDB".rdt (
 	emotion varchar(255) NULL,
 	response varchar(255) NULL,
 	outcome varchar(255) NULL,
-	CONSTRAINT "RDT_PK" PRIMARY KEY (id)
+	person_id int4 NOT NULL,
+	CONSTRAINT rdt_pk PRIMARY KEY (id),
+	CONSTRAINT person_fk
+      FOREIGN key (person_id) 
+	  REFERENCES "DiariesDB"."person"(id)
 );
 
 commit;

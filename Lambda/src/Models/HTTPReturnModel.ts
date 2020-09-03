@@ -1,6 +1,6 @@
 import {APIGatewayProxyResult} from 'aws-lambda/trigger/api-gateway-proxy';
 
-export class HTTPReturn implements APIGatewayProxyResult{
+export class HTTPReturnModel implements APIGatewayProxyResult{
   isBase64Encoded:boolean;
   statusCode:number;
   body:string;

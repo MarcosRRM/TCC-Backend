@@ -1,33 +1,33 @@
 import * as router from 'aws-lambda-router';
-import RDTService from './Services/RDTService';
+//import RDTService from './Services/RDTService';
 import PersonService from './Services/PersonService';
 import UserService from './Services/UserService';
 
 export const handler = router.handler({
   proxyIntegration:{
     routes: [
-      //#region RDT Endpoints  
-      {
-        path: '/rdt',
-        method: 'GET',
-        action: RDTService.GetRDTArray
-      },
-      {
-        path: '/rdt/{id}',
-        method: 'GET',
-        action: RDTService.GetRDT
-      },
-      {
-        path: '/rdt/person/{id}',
-        method: 'GET',
-        action: RDTService.GetRDTArrayByAuthor
-      },
-      {
-        path: '/rdt/{id}',
-        method: 'PUT',
-        action: RDTService.PutRDT
-      },
-      //#endregion
+      // //#region RDT Endpoints  
+      // {
+      //   path: '/rdt',
+      //   method: 'GET',
+      //   action: RDTService.GetRDTArray
+      // },
+      // {
+      //   path: '/rdt/{id}',
+      //   method: 'GET',
+      //   action: RDTService.GetRDT
+      // },
+      // {
+      //   path: '/rdt/person/{id}',
+      //   method: 'GET',
+      //   action: RDTService.GetRDTArrayByAuthor
+      // },
+      // {
+      //   path: '/rdt/{id}',
+      //   method: 'PUT',
+      //   action: RDTService.PutRDT
+      // },
+      // //#endregion
 
       //#region Person Endpoints
       {
@@ -40,14 +40,19 @@ export const handler = router.handler({
         method: 'GET',
         action: PersonService.GetPerson
       },
-      {
-        path: '/person/{id}',
-        method: 'PUT',
-        action: PersonService.PutPerson
-      },
+      // {
+      //   path: '/person/{id}',
+      //   method: 'PUT',
+      //   action: PersonService.PutPerson
+      // },
       //#endregion
     
       //#region User Endpoints
+      {
+        path: '/login',
+        method: 'POST',
+        action: UserService.LogIn
+      },
       {
         path: '/user',
         method: 'GET',
@@ -59,10 +64,10 @@ export const handler = router.handler({
         action: UserService.GetUser
       },
       {
-        path: '/user/{id}',
-        method: 'PUT',
-        action: UserService.PutUser
-      },
+        path: '/user',
+        method: 'POST',
+        action: UserService.NewUser
+      }
       //#endregion
     ]
   }

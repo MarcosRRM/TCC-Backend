@@ -15,6 +15,8 @@
     "@types/node": "^14.0.5",
     "@types/pg": "^7.14.3",
     "aws-lambda-router": "^0.8.3",
+    "js-sha512": "^0.8.0",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^8.2.1"
   }
 }
