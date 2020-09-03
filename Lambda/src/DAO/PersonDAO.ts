@@ -60,7 +60,7 @@ export default {
 
   },
 
-  UpdatePerson : async (person:PersonModel):Promise<any> => {
+  UpdatePerson : async (person:PersonModel):Promise<boolean[]|[boolean, any?]> => {
     let query = `
       UPDATE
         "DiariesDB"."person"
@@ -73,7 +73,9 @@ export default {
     
     let queryParam = [person.FullName, person.UserID, person.ID];
 
-    await ConnPool.query( query, queryParam )
+    return ConnPool.query( query, queryParam )
+    .then(() => [true])
+    .catch(err => [false,err]);
   }
 
 }

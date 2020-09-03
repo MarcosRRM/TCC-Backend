@@ -97,5 +97,38 @@ export default {
     else{
       return Promise.reject(error);
     }
+  },
+
+  UpdateRDT : async (rdt:RDTModel):Promise<boolean[]|[boolean, any?]> => {
+    let query = `
+      UPDATE
+        "DiariesDB"."rdt"
+      SET
+        tittle        = $1::text,
+        datetime      = $2::timestamp,
+        situation     = $3::text,
+        auto_thoughts = $4::text,
+        emotion       = $5::text,
+        response      = $6::text,
+        outcome       = $7::text,
+        last_update   = $8::timestamp
+      WHERE
+        id = $9::numeric
+    `;
+    
+    let queryParam = [rdt.Tittle,rdt.DateTime,rdt.Situation,rdt.AutoThoughts, rdt.Emotion,rdt.Response,rdt.Outcome,rdt.LastUpdate,rdt.ID];
+
+    return ConnPool.query( query, queryParam )
+    .then(() => [true])
+    .catch(err => [false,err]);
+  },
+
+  DeleteRDT : async (rdt:RDTModel):Promise<boolean[]|[boolean, any?]> => {
+    
+    let query = 'DELETE from "DiariesDB"."rdt" WHERE id = $1::numeric';
+    
+    return ConnPool.query( query, [rdt.ID] )
+    .then(() => [true])
+    .catch(err => [false,err]);
   }
 }

@@ -52,9 +52,9 @@ export default {
 		//#endregion
 
 		//#region Set Up
-		let toUpdate = [],
-				toSave   = [],
-				toDelete = [];
+		let toUpdate:RDTModel[] = [],
+				toSave  :RDTModel[] = [],
+				toDelete:RDTModel[] = [];
 		
 		let getCurrentError = null;
 
@@ -79,8 +79,12 @@ export default {
 			else{
 
 				//If updated on client, UPDATE
-				if (rdt.LastUpdate !== reqRdt.LastUpdate && rdt.LastUpdate < reqRdt.LastUpdate){
-					toUpdate.push(reqRdt);
+				if (rdt.LastUpdate !== reqRdt.LastUpdate){
+					let a = rdt.LastUpdate || new Date();
+					let b = reqRdt.LastUpdate || a;
+					if (a < b){
+						toUpdate.push(reqRdt);
+					}
 				}
 			}
 		
@@ -91,16 +95,53 @@ export default {
 		//#region Execution
 
 		let exeAdd:Promise<any>[] = [],
+				exeUpd:Promise<any>[] = [],
 				exeDel:Promise<any>[] = [],
-				exeUpd:Promise<any>[] = [];
+				errors:any[] = [];
 
 		//Addition
 		toSave.forEach( _rdt => {
 			exeAdd.push(RDTDAO.AddRDT(_rdt));
 		})
-		Promise.all(exeAdd)
+		await Promise.all(exeAdd)
+		.then(results=>{
+			results.forEach(result=>{
+				if (typeof result !== 'number'){
+					errors.push(result);
+				}
+			})
+		});
 
-		//TO DO
+		toUpdate.forEach( _rdt => {
+			exeUpd.push(RDTDAO.UpdateRDT(_rdt));
+		})
+		await Promise.all(exeUpd)
+		.then(results=>{
+			results.forEach(result=>{
+				if (result[0]===false){
+					errors.push(result[1]);
+				}
+			})
+		});
+
+		toDelete.forEach( _rdt => {
+			exeDel.push(RDTDAO.DeleteRDT(_rdt));
+		})
+		await Promise.all(exeDel)
+		.then(results=>{
+			results.forEach(result=>{
+				if (typeof result !== 'number'){
+					errors.push(result);
+				}
+			})
+		});
+
+		if ( errors.length > 0 ) {
+			return Promise.resolve(Return.Error(errors));
+		}
+		else{
+			 return Promise.resolve(Return.Ok('Synced'));
+		}
 
 		//#endregion
 
