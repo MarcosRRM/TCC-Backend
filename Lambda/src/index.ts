@@ -1,33 +1,34 @@
 import * as router from 'aws-lambda-router';
-//import RDTService from './Services/RDTService';
+import RDTService from './Services/RDTService';
 import PersonService from './Services/PersonService';
 import UserService from './Services/UserService';
 
 export const handler = router.handler({
   proxyIntegration:{
     routes: [
-      // //#region RDT Endpoints  
-      // {
-      //   path: '/rdt',
-      //   method: 'GET',
-      //   action: RDTService.GetRDTArray
-      // },
-      // {
-      //   path: '/rdt/{id}',
-      //   method: 'GET',
-      //   action: RDTService.GetRDT
-      // },
-      // {
-      //   path: '/rdt/person/{id}',
-      //   method: 'GET',
-      //   action: RDTService.GetRDTArrayByAuthor
-      // },
-      // {
-      //   path: '/rdt/{id}',
-      //   method: 'PUT',
-      //   action: RDTService.PutRDT
-      // },
-      // //#endregion
+
+      //#region RDT Endpoints  
+      {
+        path: '/rdt/all',
+        method: 'GET',
+        action: RDTService.GetRDTArray
+      },
+      {
+        path: '/rdt/{id}',
+        method: 'GET',
+        action: RDTService.GetRDT
+      },
+      {
+        path: '/rdt',
+        method: 'GET',
+        action: RDTService.GetRDTArrayByAuthor
+      },
+      {
+        path: '/rdt/sync',
+        method: 'POST',
+        action: RDTService.SyncUserRDT
+      },
+      //#endregion
 
       //#region Person Endpoints
       {
@@ -40,11 +41,11 @@ export const handler = router.handler({
         method: 'GET',
         action: PersonService.GetPerson
       },
-      // {
-      //   path: '/person/{id}',
-      //   method: 'PUT',
-      //   action: PersonService.PutPerson
-      // },
+      {
+        path: '/person/{id}',
+        method: 'PUT',
+        action: PersonService.PutPerson
+      },
       //#endregion
     
       //#region User Endpoints
@@ -69,6 +70,7 @@ export const handler = router.handler({
         action: UserService.NewUser
       }
       //#endregion
+    
     ]
   }
 })

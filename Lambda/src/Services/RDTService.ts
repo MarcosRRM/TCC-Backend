@@ -2,6 +2,8 @@ import {Return} from '../Utils/HTTPUtils';
 import RDTDAO from '../DAO/RDTDAO';
 import { ValidateRDT, RDTModel } from '../Models/RDTModel';
 
+const JWT = require( 'jsonwebtoken' );
+
 export default {
 	
 	GetRDTArray: async function(event: any, context:any){
@@ -25,9 +27,16 @@ export default {
 
 	GetRDTArrayByAuthor: async function(event: any, context:any){
 
-		return RDTDAO.GetAllRDT()
-		.then((res)=> Return.Ok(res.filter((rdt=>rdt.PersonID===event.pathParameters.id))))
-		.catch((err)=>Return.Error(err));
+		try{
+			let userInfo = JWT.decode(event.headers.Authorization);
+			return RDTDAO.GetAllRDT()
+			.then((res)=> Return.Ok(res.filter((rdt=>rdt.PersonID===userInfo.personId))))
+			.catch((err)=>Return.Error(err));
+		}
+		catch(e){
+			return Promise.resolve(Return.Error(e));
+		}
+
 	},
 
 	SyncUserRDT: async function(event: any, context:any){
@@ -39,7 +48,8 @@ export default {
 
 		let validArray = true,
 		    arrayError:any = '',
-		 		index;
+				 index;
+				 
 		for(index = 0; index < event.body.length ; index ++){
 			[validArray, arrayError] = ValidateRDT(event.body[index],false,false);
 			if (!validArray) { break; }
@@ -144,8 +154,8 @@ export default {
 		}
 
 		//#endregion
+	},
 
-		
-	}
+
 
 };
