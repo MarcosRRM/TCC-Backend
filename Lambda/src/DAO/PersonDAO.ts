@@ -38,12 +38,12 @@ export default {
   AddPerson : async (person:PersonModel):Promise<number|any> => {
     
     let query = `
-      INSERT INTO "DiariesDB"."person" ( full_name, user_id )
-      VALUES ($1::text, $2::numeric)
+      INSERT INTO "DiariesDB"."person" ( full_name, user_id, birth_day )
+      VALUES ($1::text, $2::numeric, $3)
       RETURNING id;
     `
 
-    let queryParam = [person.FullName, person.UserID];
+    let queryParam = [person.FullName, person.UserID, person.BirthDay];
     
     let error = '';
 

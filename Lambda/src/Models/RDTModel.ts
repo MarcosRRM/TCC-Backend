@@ -1,19 +1,19 @@
 export interface iRDTRow{
   id: number,
-  tittle: string,
-  datetime: string,
+  title: string,
+  datetime: Date,
   situation: string,
   auto_thoughts: string,
   emotion: string,
   response: string,
   outcome: string,
   person_id: number,
-  last_update: string
+  last_update: Date
 }
 
 export class RDTModel {
   ID?:number;
-  Tittle?:string;
+  Title?:string;
   DateTime?:Date;
   Situation?:string;
   AutoThoughts?:string;
@@ -23,9 +23,9 @@ export class RDTModel {
   PersonID?:number;
   LastUpdate?:Date;
 
-	constructor(tittle: string, dateTime?: Date, situation?: string, autoThoughts?: string, emotion?: string, response?: string, outcome?: string,id?:number, personId?:number, lastUpdate?:Date) {
+	constructor(title: string, dateTime?: Date, situation?: string, autoThoughts?: string, emotion?: string, response?: string, outcome?: string,id?:number, personId?:number, lastUpdate?:Date) {
     this.ID = id;
-    this.Tittle = tittle;
+    this.Title = title;
 		this.DateTime = dateTime;
 		this.Situation = situation;
 		this.AutoThoughts = autoThoughts;
@@ -38,7 +38,7 @@ export class RDTModel {
 }
 
 export function RDTFromRow(row:iRDTRow){
-  return new RDTModel(row.tittle,new Date(row.datetime),row.situation,row.auto_thoughts,row.emotion,row.response,row.outcome,row.id,row.person_id,new Date(row.last_update));
+  return new RDTModel(row.title,row.datetime,row.situation,row.auto_thoughts,row.emotion,row.response,row.outcome,row.id,row.person_id,row.last_update);
 }
 
 export function RDTArrayFromRows(rows:iRDTRow[]){
@@ -47,31 +47,31 @@ export function RDTArrayFromRows(rows:iRDTRow[]){
 
 export function ValidateRDT (rdt:RDTModel, validatePK:boolean=true, validateFK:boolean=true):[boolean,string?]{
 
-  if (typeof rdt.Tittle !== 'string' || rdt.Tittle.length > 32){
-    return [false,'Invalid Tittle'];
+  if (typeof rdt.Title !== 'string' || rdt.Title.length > 32){
+    return [false,'Invalid Title'];
   }
 
-  if (!(rdt.DateTime instanceof Date) || rdt.DateTime > new Date()){
+  if (rdt.DateTime && (!(rdt.DateTime instanceof Date) || rdt.DateTime > new Date())){
     return [false,'Invalid DateTime'];
   }
 
-  if (typeof rdt.Situation !== 'string' || rdt.Situation.length > 255){
+  if (rdt.Situation && (typeof rdt.Situation !== 'string' || rdt.Situation.length > 255)){
     return [false,'Invalid Situation'];
   }
 
-  if (typeof rdt.AutoThoughts !== 'string' || rdt.AutoThoughts.length > 255){
+  if (rdt.AutoThoughts && (typeof rdt.AutoThoughts !== 'string' || rdt.AutoThoughts.length > 255)){
     return [false,'Invalid Situation'];
   }
 
-  if (typeof rdt.Emotion !== 'string' || rdt.Emotion.length > 255){
+  if (rdt.Emotion && (typeof rdt.Emotion !== 'string' || rdt.Emotion.length > 255)){
     return [false,'Invalid Emotion'];
   }
 
-  if (typeof rdt.Response !== 'string' || rdt.Response.length > 255){
+  if (rdt.Response && (typeof rdt.Response !== 'string' || rdt.Response.length > 255)){
     return [false,'Invalid Response'];
   }
 
-  if (typeof rdt.Outcome !== 'string' || rdt.Outcome.length > 255){
+  if (rdt.Outcome && (typeof rdt.Outcome !== 'string' || rdt.Outcome.length > 255)){
     return [false,'Invalid Outcome'];
   }
 

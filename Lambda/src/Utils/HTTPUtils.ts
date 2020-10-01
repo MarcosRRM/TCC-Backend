@@ -32,4 +32,14 @@ const Return = {
   
 }
 
-export {Return}
+const GetPropInsensitive = (propName:string,obj:any) => {
+  let found = Object.keys(obj).find(key => key.toLowerCase() === propName.toLowerCase());
+  if (found != undefined){
+    return obj[found];
+  }
+  else {
+    return undefined
+  }
+}
+
+export {Return,GetPropInsensitive}

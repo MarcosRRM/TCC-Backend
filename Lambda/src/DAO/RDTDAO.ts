@@ -9,9 +9,9 @@ export default {
 		.then((res)=> RDTArrayFromRows(res.rows))
   },
 
-  GetRDTByModel: async (model:RDTModel):Promise<RDTModel> => {
+  GetRDTByModel: async (model:RDTModel, single=true):Promise<RDTModel|RDTModel[]> => {
 
-    let query = new QueryConstructor('SELECT * FROM "DiariesDB"."person" WHERE');
+    let query = new QueryConstructor('SELECT * FROM "DiariesDB"."rdt" WHERE');
 
     if (model.ID){
       query.AddParam('id = $X::numeric', model.ID);
@@ -25,8 +25,8 @@ export default {
       query.AddParam('datetime = $X', model.DateTime);
     }
 
-    if (model.Tittle){
-      query.AddParam('tittle = $X::text', model.Tittle)
+    if (model.Title){
+      query.AddParam('title = $X::text', model.Title)
     }
 
     if (model.AutoThoughts){
@@ -50,10 +50,15 @@ export default {
     }
 
     return ConnPool.query( query.Query, query.Params )
-      .then( (res) => {
-        if (res.rowCount>0){ return RDTFromRow(res.rows[0]); }
-			  else{ throw 'No Such RDT'; }
-      });
+    .then( (res) => {
+      if (res.rowCount>0){
+        return single ? RDTFromRow(res.rows[0]) : RDTArrayFromRows(res.rows);
+      }
+      else {
+        return single ? null : [];
+      }
+    })
+    .catch((err)=>{ console.log('ERROR_SELECTING_RDT: ', err, ' || MODEL: ',model); return err});
   },
 
   AddRDT: async (rdt:RDTModel):Promise<number|any> => {
@@ -61,7 +66,7 @@ export default {
     let query = `
     INSERT INTO "DiariesDB"."rdt"
     (
-      tittle,
+      title,
       datetime,
       situation,
       auto_thoughts,
@@ -72,24 +77,24 @@ export default {
       last_update
     ) VALUES(
       $1::text,
-      $2::timestamp,
+      $2,
       $3::text,
       $4::text,
       $5::text,
       $6::text,
       $7::text,
       $8::numeric,
-      $9::timestamp
+      $9
     )
     RETURNING id;
     `
-    let queryParam = [rdt.Tittle, rdt.DateTime, rdt.Situation, rdt.AutoThoughts, rdt.Emotion, rdt.Response, rdt.Outcome, rdt.PersonID, rdt.LastUpdate];
+    let queryParam = [rdt.Title, rdt.DateTime, rdt.Situation, rdt.AutoThoughts, rdt.Emotion, rdt.Response, rdt.Outcome, rdt.PersonID, rdt.LastUpdate];
 
     let error = '';
 
     let id = await ConnPool.query( query, queryParam )
     .then((res)=> res.rows[0].id )
-    .catch((err)=> {error = err; return 0;})
+    .catch((err)=> { console.log(`ERROR_ADDING_RDT: `, err, ' || RDT: ',rdt); error = err; return 0;})
 
     if (id>0){
       return Promise.resolve(id);
@@ -104,23 +109,23 @@ export default {
       UPDATE
         "DiariesDB"."rdt"
       SET
-        tittle        = $1::text,
-        datetime      = $2::timestamp,
+        title         = $1::text,
+        datetime      = $2,
         situation     = $3::text,
         auto_thoughts = $4::text,
         emotion       = $5::text,
         response      = $6::text,
         outcome       = $7::text,
-        last_update   = $8::timestamp
+        last_update   = $8
       WHERE
         id = $9::numeric
     `;
     
-    let queryParam = [rdt.Tittle,rdt.DateTime,rdt.Situation,rdt.AutoThoughts, rdt.Emotion,rdt.Response,rdt.Outcome,rdt.LastUpdate,rdt.ID];
+    let queryParam = [rdt.Title,rdt.DateTime,rdt.Situation,rdt.AutoThoughts, rdt.Emotion,rdt.Response,rdt.Outcome,rdt.LastUpdate,rdt.ID];
 
     return ConnPool.query( query, queryParam )
     .then(() => [true])
-    .catch(err => [false,err]);
+    .catch(err => { console.log(`ERROR_UPDATING_RDT: `, err, ' || RDT: ',rdt); return [false,err]});
   },
 
   DeleteRDT : async (rdt:RDTModel):Promise<boolean[]|[boolean, any?]> => {
@@ -129,6 +134,6 @@ export default {
     
     return ConnPool.query( query, [rdt.ID] )
     .then(() => [true])
-    .catch(err => [false,err]);
+    .catch(err => { console.log(`ERROR_DELETING_RDT: `, err, ' || RDT: ',rdt); return [false,err]});
   }
 }

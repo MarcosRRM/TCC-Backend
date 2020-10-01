@@ -9,9 +9,9 @@ export default {
 		.then((res)=> UserArrayFromRows(res.rows))
   },
 
-  GetUserByModel : async (model:UserModel):Promise<UserModel> => {
+  GetUserByModel : async (model:UserModel, single=true):Promise<UserModel|UserModel[]> => {
 
-    let query = new QueryConstructor('SELECT * FROM "DiariesDB"."user" WHERE');
+    let query = new QueryConstructor('SELECT * FROM "DiariesDB"."user" WHERE ');
 
     if (model.ID){
       query.AddParam('id = $X::numeric', model.ID);
@@ -27,9 +27,14 @@ export default {
 
     return ConnPool.query(query.Query, query.Params)
     .then((res)=>{
-			if (res.rowCount>0){ return UserFromRow(res.rows[0]); }
-			else{ throw 'No Such User' }
-		})
+			if (res.rowCount>0){
+        return single ? UserFromRow(res.rows[0]) : UserArrayFromRows(res.rows);
+      }
+      else {
+        return single ? null : [];
+      }
+    })
+    .catch((err)=>{ console.log('ERROR_SELECTING_USER: ',err,' || USER: ',model); return err});
   },
 
   AddUser : async (user:UserModel):Promise<number|any> => {
@@ -54,5 +59,25 @@ export default {
     else{
       return Promise.reject(error);
     }
+  },
+
+  UpdateUser : async (user:UserModel):Promise<boolean[]|[boolean,string]> => {
+    let query = `
+    UPDATE
+      "DiariesDB"."user"
+    SET
+      email            = $1::text,
+      password_hash    = $2::text,
+      level            = $3::numeric,
+      password_reseted = $4::boolean
+    WHERE
+      id = $5::numeric
+    `;
+
+    let queryParam = [user.Email,user.PasswordHash,user.Level,user.PasswordReseted,user.ID];
+
+    return ConnPool.query( query, queryParam )
+    .then(() => [true])
+    .catch(err => { console.log(`ERROR_UPDATING_USER: `, err, ' || USER: ',user); return [false,err]});
   }
 }

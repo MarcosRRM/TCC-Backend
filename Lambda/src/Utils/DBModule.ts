@@ -1,7 +1,7 @@
 import {Pool} from "pg";
 
 const ConnPool = new Pool({
-	max: 5,
+	max: 25,
 	connectionTimeoutMillis: 5000
 });
 

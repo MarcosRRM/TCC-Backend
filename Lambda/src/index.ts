@@ -9,7 +9,7 @@ export const handler = router.handler({
 
       //#region RDT Endpoints  
       {
-        path: '/rdt/all',
+        path: '/rdt',
         method: 'GET',
         action: RDTService.GetRDTArray
       },
@@ -17,11 +17,6 @@ export const handler = router.handler({
         path: '/rdt/{id}',
         method: 'GET',
         action: RDTService.GetRDT
-      },
-      {
-        path: '/rdt',
-        method: 'GET',
-        action: RDTService.GetRDTArrayByAuthor
       },
       {
         path: '/rdt/sync',
@@ -36,16 +31,21 @@ export const handler = router.handler({
         method: 'GET',
         action: PersonService.GetPersonArray
       },
+      // {
+      //   path: '/person/{id}',
+      //   method: 'GET',
+      //   action: PersonService.GetPerson
+      // },
       {
-        path: '/person/{id}',
+        path: '/person/rdt',
         method: 'GET',
-        action: PersonService.GetPerson
+        action: RDTService.GetRDTArrayByAuthor
       },
-      {
-        path: '/person/{id}',
-        method: 'PUT',
-        action: PersonService.PutPerson
-      },
+      // {
+      //   path: '/person/{id}',
+      //   method: 'PUT',
+      //   action: PersonService.PutPerson
+      // },
       //#endregion
     
       //#region User Endpoints
@@ -60,14 +60,24 @@ export const handler = router.handler({
         action: UserService.GetUserArray
       },
       {
-        path: '/user/{id}',
-        method: 'GET',
-        action: UserService.GetUser
-      },
-      {
         path: '/user',
         method: 'POST',
         action: UserService.NewUser
+      },
+      {
+        path: '/user/password',
+        method: 'PUT',
+        action: UserService.ChangePW
+      },
+      {
+        path: '/user/password/reset',
+        method: 'POST',
+        action: UserService.ResetPW
+      },
+      {
+        path: '/testtoken',
+        method: 'GET',
+        action: UserService.TestToken
       }
       //#endregion
     

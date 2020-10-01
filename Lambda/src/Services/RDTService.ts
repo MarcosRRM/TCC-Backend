@@ -1,4 +1,4 @@
-import {Return} from '../Utils/HTTPUtils';
+import {GetPropInsensitive, Return} from '../Utils/HTTPUtils';
 import RDTDAO from '../DAO/RDTDAO';
 import { ValidateRDT, RDTModel } from '../Models/RDTModel';
 
@@ -28,9 +28,9 @@ export default {
 	GetRDTArrayByAuthor: async function(event: any, context:any){
 
 		try{
-			let userInfo = JWT.decode(event.headers.Authorization);
-			return RDTDAO.GetAllRDT()
-			.then((res)=> Return.Ok(res.filter((rdt=>rdt.PersonID===userInfo.personId))))
+			let userInfo = JWT.decode(GetPropInsensitive('authorization',event.headers).split(' ')[1]);
+			return RDTDAO.GetRDTByModel({PersonID: userInfo.personId},false)
+			.then((data)=>Return.Ok(data))
 			.catch((err)=>Return.Error(err));
 		}
 		catch(e){
@@ -48,11 +48,16 @@ export default {
 
 		let validArray = true,
 		    arrayError:any = '',
-				 index;
-				 
+				index;
+			
+		let userInfo = JWT.decode(GetPropInsensitive('authorization',event.headers).split(' ')[1]);
+		
 		for(index = 0; index < event.body.length ; index ++){
+			event.body[index].DateTime   = new Date(event.body[index].DateTime);
+			event.body[index].LastUpdate = new Date(event.body[index].LastUpdate);
 			[validArray, arrayError] = ValidateRDT(event.body[index],false,false);
 			if (!validArray) { break; }
+			event.body[index].PersonID = userInfo.personId;
 		}
 		if (!validArray) {
 			return Promise.resolve(Return.BadReq(`Invalid RDT at position ${index}: ${arrayError}.`));
@@ -68,10 +73,9 @@ export default {
 		
 		let getCurrentError = null;
 
-		let UserRDT:RDTModel[] = await RDTDAO.GetAllRDT()
-		.then((res)=> res.filter((rdt=>rdt.PersonID===event.pathParameters.id)))
+		let UserRDT:RDTModel[] = await RDTDAO.GetRDTByModel({PersonID:userInfo.personId},false)
 		.catch((err)=>getCurrentError=err);
-
+		console.log('USERRDT:',UserRDT);
 		if (getCurrentError) return Promise.resolve(Return.Error(getCurrentError));
 
 		//#endregion
@@ -113,11 +117,14 @@ export default {
 		toSave.forEach( _rdt => {
 			exeAdd.push(RDTDAO.AddRDT(_rdt));
 		})
-		await Promise.all(exeAdd)
+		let addAll = Promise.all(exeAdd)
 		.then(results=>{
-			results.forEach(result=>{
+			results.forEach((result,index)=>{
 				if (typeof result !== 'number'){
 					errors.push(result);
+				}
+				else{
+					toSave[index].ID = result;
 				}
 			})
 		});
@@ -125,37 +132,38 @@ export default {
 		toUpdate.forEach( _rdt => {
 			exeUpd.push(RDTDAO.UpdateRDT(_rdt));
 		})
-		await Promise.all(exeUpd)
+
+		let updAll = Promise.all(exeUpd)
 		.then(results=>{
 			results.forEach(result=>{
 				if (result[0]===false){
 					errors.push(result[1]);
 				}
-			})
+			});
 		});
 
 		toDelete.forEach( _rdt => {
 			exeDel.push(RDTDAO.DeleteRDT(_rdt));
 		})
-		await Promise.all(exeDel)
+		let delAll = Promise.all(exeDel)
 		.then(results=>{
 			results.forEach(result=>{
-				if (typeof result !== 'number'){
-					errors.push(result);
+				if (!result[0]){
+					errors.push(result[1]);
 				}
 			})
 		});
+
+		await Promise.all([addAll,updAll,delAll]);
 
 		if ( errors.length > 0 ) {
 			return Promise.resolve(Return.Error(errors));
 		}
 		else{
-			 return Promise.resolve(Return.Ok('Synced'));
+			return Promise.resolve(Return.Ok({Added:toSave}));
 		}
 
 		//#endregion
 	},
-
-
 
 };
